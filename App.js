@@ -69,100 +69,109 @@ export default function App() {
     })
 
     return(
-      <View style={styles.container} > 
-        <Picker 
-          style={styles.countriesPicker}
-          selectedValue={paisActual}
-          onValueChange={(itemValue, itemIndex) => {
-            setPaisActual(itemValue)
-            let ciudad = {"country": itemValue}
+      
+      <View style={styles.container}>
 
-            fetch('https://countriesnow.space/api/v0.1/countries/cities', 
-            {
-              method: "POST",
-              headers: {
-                'Content-Type': 'application/json'
-              }, 
-              body: JSON.stringify(ciudad)
-            })
-            .then(response => response.json())
-            .then(data => {
-              let ciudadesInfo = data.data;
-              console.log(ciudadesInfo);
-              let arrPickerCiudades  = [];
-              ciudadesInfo.map((item, index)=>{
-                if(item != undefined){
-                  arrPickerCiudades.push(<Picker.Item label={item} value={item} key={index}/>)
-                }
-              });
-              setCiudadesPicker(arrPickerCiudades);
+        {/* Picker de Paises */}
 
-            });
-          }}
-        >
-         {arrPickerItems}
-    
-        </Picker>
-          
-        {/* Picker de ciudades */}
+        <View style={styles.viewTempStyles}> 
+          <Picker 
+            style={styles.countriesPicker}
+            selectedValue={paisActual}
+            onValueChange={(itemValue, itemIndex) => {
+              setPaisActual(itemValue)
+              let ciudad = {"country": itemValue}
 
-        <Picker
-          style={styles.ciudadesPickerStyle}
-          selectedValue={ciudadActual}
-          onValueChange={(itemValue, itemIndex) => {
-            setCiudadActual(itemValue)
-            
-            const apiKey = '87370707da37bfcc0b74fc8ccc7af204';
-            const URL = `https://api.openweathermap.org/data/2.5/weather?q=${itemValue}&appid=${apiKey}`;
-            console.log(itemValue);
-
-            fetch(URL)
+              fetch('https://countriesnow.space/api/v0.1/countries/cities', 
+              {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                }, 
+                body: JSON.stringify(ciudad)
+              })
               .then(response => response.json())
               .then(data => {
-                console.log(JSON.stringify(data.main.temp));
-                let tempC = '';
-                tempC = JSON.stringify(data.main.temp);
-                let Description = '';
-                Description = JSON.stringify(data.weather[0].description);
-                let long = 0.0;
-                let lat = 0.0;
-                console.log(data.coord.lon)
-                console.log(data.coord.lat)
-                long = JSON.stringify(data.coord.lon);
-                lat = JSON.stringify(data.coord.lat);
-                console.log(long);
-                console.log(lat);
-                let celcius = tempC * 9/5 - 459.67;
-                setTempCiudad(celcius.toFixed(2));
-                setWeather(Description);
-                setLongitud(long);
-                setLatitude(lat);
-                //setTimeZone(timeZ);
+                let ciudadesInfo = data.data;
+                console.log(ciudadesInfo);
+                let arrPickerCiudades  = [];
+                ciudadesInfo.map((item, index)=>{
+                  if(item != undefined){
+                    arrPickerCiudades.push(<Picker.Item label={item} value={item} key={index}/>)
+                  }
+                });
+                setCiudadesPicker(arrPickerCiudades);
+
               })
+              .catch(err => console.log(err));
+            }}
+          >
+          {arrPickerItems}
+      
+          </Picker>
+            
+          {/* Picker de ciudades */}
+
+          <Picker
+            style={styles.ciudadesPickerStyle}
+            selectedValue={ciudadActual}
+            onValueChange={(itemValue, itemIndex) => {
+              setCiudadActual(itemValue)
               
+              const apiKey = '87370707da37bfcc0b74fc8ccc7af204';
+              const URL = `https://api.openweathermap.org/data/2.5/weather?q=${itemValue}&appid=${apiKey}`;
+              console.log(itemValue);
 
-          }}
-        >
-          {ciudadesPicker}
-
-        </Picker>
-
-        {/* Temperatura de la ciudad */}
-        <View style={{marginTop: 10}}>
-          <Text
-            style={styles.tempStyles}
+              fetch(URL)
+                .then(response => response.json())
+                .then(data => {
+                  console.log(JSON.stringify(data.main.temp));
+                  let tempC = '';
+                  tempC = JSON.stringify(data.main.temp);
+                  let Description = '';
+                  Description = JSON.stringify(data.weather[0].description);
+                  let long = 0.0;
+                  let lat = 0.0;
+                  console.log(data.coord.lon)
+                  console.log(data.coord.lat)
+                  long = JSON.stringify(data.coord.lon);
+                  lat = JSON.stringify(data.coord.lat);
+                  console.log(long);
+                  console.log(lat);
+                  let celcius = tempC * 9/5 - 459.67;
+                  setTempCiudad(celcius.toFixed(2));
+                  setWeather(Description);
+                  setLongitud(long);
+                  setLatitude(lat);
+                })
+            }}
           >
-            Temperatura de la ciudad: {tempCiudad} °F
+            {ciudadesPicker}
+
+          </Picker>
+        </View>
+
+        {/* Resultados de Temperatura de la ciudad */}
+
+        <View style={styles.viewTempResultStyles} >
+          <Text
+            style={styles.textStyles}>
+            Temperatura de {ciudadActual}: {tempCiudad}  °F
+
           </Text>
+
           <Text
-            style={styles.tempStyles}
-          >
+            style={styles.textStyles}>
             Clima: {weather}
+
           </Text>
         </View>
 
-        <View style={styles.container}>
+        {/* Time Zone de la ciudad */}
+
+        <View  style={styles.viewTimeZoneStyles}>
           <Button
+            style = {{marginBottom: 50}}
             title="Time Zone"
             onPress={() => {
               const apiKey2 = 'BLNTTG4YU6PU';
@@ -172,20 +181,26 @@ export default function App() {
                 .then(data => {
                   console.log(data.abbreviation);
                   let zoneT = data.abbreviation + ' - ' + data.zoneName + 
-                              '- Offset: ' + (data.gmtOffset/60)/60 + ' Hours';
+                              ' - Offset: ' + (data.gmtOffset/60)/60 + ' Hours';
                   setTimeZone(zoneT);
                   
               })
 
             }}> 
           </Button>
-          <Text style={styles.tempStyles}>
+
+          {/* Resultados del time zone*/}
+
+          <Text style={styles.textStyles}>
             {timeZone}
           </Text>
         </View>
 
-        <View style={styles.container} >
-          <Text> Selecciona una Moneda Local </Text>
+        {/* Conversion de monedas a USD */}
+
+        <View style={styles.viewExchangeStyles} >
+          <Text style={styles.textStyles}> 
+            Selecciona una Moneda Local: </Text>
           <Picker
           style={styles.currencyStyles}
             selectedValue={monedaActual}
@@ -227,58 +242,80 @@ export default function App() {
             {arrPickerCurrencies}
 
           </Picker>
-          <Text>
+
+          {/* Resultado de conversion de monedas  */}
+
+          <Text 
+          style={styles.textStyles}>
             Conversion: 1 USD =  {resultado}    {monedaActual}
           </Text>
-
-
-
         </View>
-
       </View>
     );
   
 }
 
 const styles = StyleSheet.create({
+
+  viewTempStyles: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center'
+
+  },
+
+  viewTempResultStyles: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-evenly'
+  },
+
+  viewTimeZoneStyles: {
+    flex: 1.5,
+    alignItems: 'center',
+    justifyContent: 'space-evenly'
+  },
+
+  viewExchangeStyles: {
+    flex: 2.5,
+    alignItems: 'center',
+    justifyContent: 'space-evenly'
+  },
   
   currencyStyles:{
     height: 50,
     width: 190,
-    backgroundColor: '#aaa',
+    backgroundColor: '#B1D4E0',
     borderBottomColor: '#bbb',
     borderBottomWidth: 2,
     alignItems: 'center'
   },
   
-
-  tempStyles: {
-    margintop: -200
-  },
-  fixToText: {
-    marginTop: 10,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+  textStyles: {
+    fontSize: 18,
+    color: '#EBEBEB',
+    fontFamily: 'cursive',
+    wordSpacing: 3,
+    marginBottom: 10
+    
   },
 
   countriesPicker:{
-
     height: 50,
     width: '60%',
-    marginTop: 150,
+    marginTop: 10,
     marginBottom: 15,
-    backgroundColor: '#aaa',
+    backgroundColor: '#B1D4E0',
     borderBottomColor: '#bbb',
     borderBottomWidth: 2,
     alignItems: 'center'
   },
 
   ciudadesPickerStyle:{
-
     height: 50,
     width: '60%',
     marginBottom: 15,
-    backgroundColor: '#aaa',
+    backgroundColor: '#B1D4E0',
     borderBottomColor: '#bbb',
     borderBottomWidth: 2,
     alignItems: 'center'
@@ -286,7 +323,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex:1,
-    backgroundColor: '#fff',
+    backgroundColor: '#145DA0',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column'
