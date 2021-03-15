@@ -185,7 +185,7 @@ export default function App() {
         </View>
 
         <View style={styles.container} >
-          <Text>Moneda Local a USD </Text>
+          <Text> Selecciona una Moneda Local </Text>
           <Picker
           style={styles.currencyStyles}
             selectedValue={monedaActual}
@@ -228,7 +228,7 @@ export default function App() {
 
           </Picker>
           <Text>
-            Conversion: 1 USD =  {resultado}
+            Conversion: 1 USD =  {resultado}    {monedaActual}
           </Text>
 
 
